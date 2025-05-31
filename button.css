@@ -1,3 +1,21 @@
+:root {
+  --backgroundColor: rgba(246, 241, 209); /* Fundo claro (pode manter ou mudar) */
+  --colorShadeA: rgb(147, 112, 219); /* Roxo médio */
+  --colorShadeB: rgb(153, 102, 204); /* Roxo mais escuro */
+  --colorShadeC: rgb(186, 146, 255); /* Roxo pastel */
+  --colorShadeD: rgb(216, 191, 255); /* Roxo muito claro */
+  --colorShadeE: rgb(230, 218, 255); /* Roxo quase branco */
+}
+
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700");
+* {
+  box-sizing: border-box;
+}
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .big-button {
   font-family: "OpenSans", sans-serif;
   font-size: 1rem;
