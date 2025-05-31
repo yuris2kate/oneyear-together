@@ -15,4 +15,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  base: '/oneyear-together/' // <--- ADICIONE ESTA LINHA
 })
