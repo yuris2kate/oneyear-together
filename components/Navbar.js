@@ -1,6 +1,3 @@
-// Importa o componente Button (relativo ao caminho do seu arquivo)
-const Button = window.Button || require('./Button.js');
-
 const Navbar = {
   template: `
     <nav class="navbar">
@@ -12,27 +9,15 @@ const Navbar = {
       </div>
     </nav>
   `,
-  components: {
-    'app-button': Button
-  },
   data() {
     return {
-      homeImage: '../assets/house.png',
-      graphImage: '../assets/graph.png',
-      contactImage: '../assets/contact.png',
-      futureImage: '../assets/friends.png'
+      homeImage: 'assets/house.png',
+      graphImage: 'assets/graph.png',
+      contactImage: 'assets/contact.png',
+      futureImage: 'assets/friends.png'
     };
   }
 };
 
-// Registra o componente globalmente
-if (typeof window !== 'undefined' && window.Vue) {
-  window.Vue.component('navbar', Navbar);
-}
-
-// Exporta para uso em outros módulos
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = Navbar;
-} else {
-  window.Navbar = Navbar;
-}
+// Armazena o componente para registro posterior
+window.MyApp.components.Navbar = Navbar;

@@ -12,16 +12,5 @@ const Button = {
   }
 };
 
-// Registra o componente globalmente se estiver em um arquivo separado
-if (typeof window !== 'undefined' && window.Vue) {
-  window.Vue.component('app-button', Button);
-}
-
-// Exporta para uso em outros módulos
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = Button;
-} else if (typeof define === 'function' && define.amd) {
-  define([], function() { return Button; });
-} else {
-  window.Button = Button;
-}
+// Armazena o componente para registro posterior
+window.MyApp.components.Button = Button;
