@@ -17,10 +17,10 @@ const Navbar = {
   },
   data() {
     return {
-      homeImage: 'assets/house.png',
-      graphImage: 'assets/graph.png',
-      contactImage: 'assets/contact.png',
-      futureImage: 'assets/friends.png'
+      homeImage: '../assets/house.png',
+      graphImage: '../assets/graph.png',
+      contactImage: '../assets/contact.png',
+      futureImage: '../assets/friends.png'
     };
   }
 };
