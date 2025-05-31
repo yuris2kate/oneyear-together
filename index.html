@@ -1,13 +1,432 @@
 <!DOCTYPE html>
-<html lang="">
-  <head>
+<html lang="pt-BR">
+<head>
     <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feliz 1 Ano de Namoro - Kate</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+    <title>Timeline Vue.js</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        /* General Body Style (from main component) */
+        body {
+            background-image: url("./assets/kawaii.png"); /* Adjusted path */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0; /* Added to ensure full coverage */
+            padding: 0; /* Added to ensure full coverage */
+            font-family: "Comic Sans MS", cursive, sans-serif; /* Applied from .event class to body */
+        }
+
+        /* Main Timeline Styles (from main component) */
+        .event { /* This class was on a container, styles moved to body or other specific elements */
+            /* height: 100vh; */ /* Potentially problematic for scrolling content */
+            /* width: 100vw; */
+            text-align: center;
+        }
+
+        .timeline { /* This is the purple container */
+            display: flex;
+            width: 1200px; /* Max width, consider responsiveness for smaller screens */
+            max-width: 95%; /* Make it responsive */
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            /* Styles from .bg-purple */
+            background-color: rgba(179, 183, 234, 0.95);
+            box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2);
+            /* width: calc(100% - 100px); */ /* Handled by max-width */
+            border-radius: 20px;
+            padding-bottom: 20px; /* Add some padding at the bottom */
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            width: 4px;
+            background-color: #007bff;
+            top: 100px; /* Adjust based on button and title height */
+            bottom: 20px; /* Adjust to not overlap last item too much */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0; /* Ensure it's behind content but above background */
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex; /* Changed from 'flex' to 'block' or adjust children for flex */
+            width: 100%;
+            padding: 20px 40px;
+            box-sizing: border-box;
+            margin-top: 20px;
+            z-index: 1; /* To be above the timeline line */
+        }
+
+        .timeline-item:first-of-type {
+            margin-top: 0; 
+        }
+
+        .timeline-item:nth-child(odd)::before {
+            content: "";
+            position: absolute;
+            top: 50%; 
+            transform: translateY(-50%);
+            right: calc(50% - 7px); 
+            width: 14px; 
+            height: 14px;
+            background: rgba(233, 33, 99, 1);
+            border-radius: 50%;
+            border: 2px solid white; 
+            box-shadow: 0 0 0 3px rgba(233, 33, 99, 0.2);
+            z-index: 2; /* Above timeline line */
+        }
+
+        .timeline-item:nth-child(even)::before {
+            content: "";
+            position: absolute;
+            top: 50%; 
+            transform: translateY(-50%);
+            left: calc(50% - 7px); 
+            width: 14px; 
+            height: 14px;
+            background: rgba(233, 33, 99, 1);
+            border-radius: 50%;
+            border: 2px solid white; 
+            box-shadow: 0 0 0 3px rgba(233, 33, 99, 0.2);
+            z-index: 2; /* Above timeline line */
+        }
+
+        .timeline-item:nth-child(odd) {
+            padding-left: calc(50% + 30px); 
+            justify-content: flex-start; 
+            text-align: left;
+        }
+
+        .timeline-item:nth-child(even) {
+            padding-right: calc(50% + 30px); 
+            flex-direction: row-reverse; 
+            justify-content: flex-start; 
+            text-align: left; 
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content {
+            /* align-items: flex-end; If using flex on timeline-item */
+            margin-left: auto; /* Pushes content to the right side */
+            margin-right: 0;
+        }
+        .timeline-item:nth-child(odd) .timeline-content {
+            /* align-items: flex-start; If using flex on timeline-item */
+            margin-right: auto; /* Pushes content to the left side */
+            margin-left: 0;
+        }
+
+
+        .timeline-content {
+            display: flex; /* Original was flex, but sub-alignment was centered. */
+            flex-direction: column; /* Ensures items stack vertically */
+            align-items: center; /* Center items like image, text, date */
+            max-width: calc(100% - 70px); /* Adjusted from 80% to 100% of its side */
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.85); /* Slightly more opaque */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            /* Removed specific text-align: center from here if odd/even handles it */
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content {
+            order: 1; 
+            text-align: left; /* Text inside content box for even items */
+            align-items: flex-start; /* Align content items to start for even */
+        }
+        .timeline-item:nth-child(odd) .timeline-content {
+             text-align: left; /* Text inside content box for odd items */
+             align-items: flex-start; /* Align content items to start for odd */
+        }
+
+
+        .timeline-content p {
+            white-space: pre-line;
+            margin-bottom: 0.5rem; 
+            width: 100%; /* Ensure p takes full width of content box */
+        }
+         .timeline-content h5.timeline-date {
+            width: 100%; /* Ensure h5 takes full width */
+            margin-top: 0.5rem;
+        }
+
+
+        .timeline-img {
+            width: 100px; /* Increased size */
+            height: 100px; /* Increased size */
+            cursor: pointer;
+            overflow: hidden;
+            background-color: white;
+            border: 4px solid #007bff; /* Thicker border */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%; 
+            flex-shrink: 0; 
+            margin-bottom: 15px; /* Space between image and description */
+        }
+
+        .timeline-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Styles for ImagePreview Component (from ImagePreview.vue) */
+        .overlay-image-preview { /* Renamed from .overlay to be specific */
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            background: rgba(0, 0, 0, 0.85); /* Darker overlay */
+            z-index: 10000; 
+        }
+
+        .overlay-image-preview img {
+            max-width: 90%; 
+            max-height: 90%; 
+            object-fit: contain;
+            border: 5px solid white; /* Added border */
+            border-radius: 5px; /* Slight rounding */
+        }
+        
+        /* Navbar Styles (from Navbar.vue) */
+        .navbar .menu { /* Made specific */
+            display: flex;
+            width: 100%; /* Allow navbar to be full width */
+            max-width: 1200px; /* But content centered */
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+
+        /* The original Navbar CSS had:
+        .menu .button { ... } 
+        .menu .button:hover { background-color: var(--colorShadeD); }
+        This targets a class 'button'. The ButtonComponent below uses Bootstrap's 'btn' class.
+        If you have specific styles for a '.button' class, you might need to adjust the ButtonComponent
+        or this CSS. The --colorShadeD variable is also not defined here.
+        The ButtonComponent below has some basic styling.
+        */
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
+
+        // 1. Button Component (Placeholder/Simple Implementation)
+        const ButtonComponent = {
+            props: ['buttonText', 'buttonLink', 'buttonImage'],
+            template: `
+                <a :href="buttonLink" class="btn btn-light me-3 mb-2" style="display: inline-flex; align-items: center; text-decoration: none; color: #2c3e50; background-color: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 25px; padding: 10px 18px; font-weight: 500; transition: background-color 0.3s, box-shadow 0.3s;">
+                    <img v-if="buttonImage" :src="buttonImage" alt="" width="20" height="20" style="margin-right: 10px;">
+                    {{ buttonText }}
+                </a>
+            `
+            // Note: Added mb-2 for wrapping scenarios.
+        };
+
+        // 2. Navbar Component
+        const NavbarComponent = {
+            components: {
+                'Button': ButtonComponent
+            },
+            setup() {
+                const homeImage = './assets/house.png';
+                const graphImage = './assets/graph.png';
+                const contactImage = './assets/contact.png';
+                const futureImage = './assets/friends.png';
+                return { homeImage, graphImage, contactImage, futureImage };
+            },
+            template: `
+                <nav class="navbar py-3">
+                  <div class="menu">
+                    <Button buttonText="Home" buttonLink="#home" :buttonImage="homeImage" />
+                    <Button buttonText="Momentos" buttonLink="#momentos" :buttonImage="graphImage" />
+                    <Button buttonText="Whatsapp" buttonLink="#whatsapp" :buttonImage="contactImage" />
+                    <Button buttonText="Futuro" buttonLink="#enigma" :buttonImage="futureImage"/>
+                  </div>
+                </nav>
+            \`
+        };
+
+        // 3. ImagePreview Component
+        const ImagePreviewComponent = {
+            props: {
+                imageSrc: { type: String, required: true },
+            },
+            emits: ['close'],
+            methods: {
+                closeImage(event) {
+                    if (event.target === event.currentTarget) {
+                        this.$emit('close');
+                    }
+                },
+            },
+            template: \`
+                <div class="overlay-image-preview" @click="closeImage">
+                  <img :src="imageSrc" alt="Imagem Centralizada" />
+                </div>
+            \`
+        };
+
+        // 4. Main App Component (Timeline)
+        const App = {
+            components: {
+                Navbar: NavbarComponent,
+                ImagePreview: ImagePreviewComponent,
+            },
+            setup() {
+                const allEvents = ref([]);
+                const currentPreviewImage = ref(null);
+                const visibleCount = ref(5);
+                const loading = ref(false);
+
+                const showImagePreview = (image) => {
+                    currentPreviewImage.value = image;
+                };
+                const hideImagePreview = () => {
+                    currentPreviewImage.value = null;
+                };
+
+                const parseDate = (dateString) => {
+                    const parts = dateString.split('/');
+                    if (parts.length === 3) {
+                        const [day, month, year] = parts;
+                        return new Date(\`\${year}-\${month.padStart(2, '0')}-\${day.padStart(2, '0')}\`);
+                    }
+                    return new Date(dateString); // Fallback for other date formats if any
+                };
+
+                const visibleEvents = computed(() =>
+                    allEvents.value.slice(0, visibleCount.value)
+                );
+
+                const loadMoreEvents = () => {
+                    if (loading.value || visibleCount.value >= allEvents.value.length) return;
+                    loading.value = true;
+                    setTimeout(() => {
+                        visibleCount.value = Math.min(
+                            visibleCount.value + 5,
+                            allEvents.value.length
+                        );
+                        loading.value = false;
+                    }, 1500); // Adjusted timeout
+                };
+
+                const carregarTodas = () => {
+                    if (visibleCount.value >= allEvents.value.length) return;
+                    loading.value = true;
+                    setTimeout(() => {
+                        visibleCount.value = allEvents.value.length;
+                        loading.value = false;
+                    }, 200); // Adjusted timeout
+                };
+
+                const handleScroll = () => {
+                    if (
+                        window.innerHeight + window.scrollY >= document.body.offsetHeight - 150 && // Adjusted threshold
+                        !loading.value &&
+                        visibleCount.value < allEvents.value.length
+                    ) {
+                        loadMoreEvents();
+                    }
+                };
+
+                const totalEvents = computed(() => allEvents.value.length);
+
+                onMounted(async () => {
+                    try {
+                        // IMPORTANT: Ensure momentos.json is at ./assets/momentos/momentos.json
+                        const response = await fetch('./assets/momentos/momentos.json');
+                        if (!response.ok) {
+                            throw new Error(\`HTTP error! status: \${response.status} ao buscar momentos.json\`);
+                        }
+                        const momentos = await response.json();
+                        
+                        const processedEvents = momentos.map(m => ({
+                            ...m,
+                            image: './assets/momentos/' + m.image 
+                        })).sort((a, b) => parseDate(a.date) - parseDate(b.date));
+                        
+                        allEvents.value = processedEvents;
+
+                    } catch (error) {
+                        console.error("Falha ao carregar momentos:", error);
+                        // You could set a message to display to the user here
+                        // e.g., allEvents.value = [{description: "Erro ao carregar dados.", date: "", image: ""}];
+                    }
+                    
+                    window.addEventListener("scroll", handleScroll);
+                });
+
+                onUnmounted(() => {
+                  window.removeEventListener("scroll", handleScroll);
+                });
+
+                return {
+                    visibleEvents,
+                    totalEvents,
+                    loading,
+                    carregarTodas,
+                    currentPreviewImage,
+                    showImagePreview,
+                    hideImagePreview
+                };
+            },
+            template: \`
+                <div class="container-fluid d-flex flex-column justify-content-start align-items-center min-vh-100 py-4">
+                    <Navbar />
+                    <ImagePreview v-if="currentPreviewImage" :imageSrc="currentPreviewImage" @close="hideImagePreview"/>
+                    
+                    <div class="timeline bg-purple mt-5 d-flex flex-column">
+                        <div class="d-flex justify-content-center my-3 px-3">
+                            <button @click="carregarTodas" class="btn btn-primary mx-2">
+                                Carregar todas! ({{ visibleEvents.length }}/{{ totalEvents }})
+                            </button>
+                        </div>
+                        <h2 class="text-center my-4">Linha do Tempo</h2>
+                        
+                        <div v-for="(event, index) in visibleEvents" :key="event.date + '-' + index" class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-img" @click="showImagePreview(event.image)">
+                                    <img :src="event.image" :alt="event.description.substring(0, 30)" class="img-fluid" />
+                                </div>
+                                <p style="white-space: pre-line;">{{ event.description }}</p>
+                                <h5 class="timeline-date">{{ event.date }}</h5>
+                            </div>
+                        </div>
+                         <p v-if="!loading && visibleEvents.length === 0 && totalEvents === 0" class="text-center text-white mt-4">Nenhum momento encontrado. Verifique o arquivo momentos.json.</p>
+                         <p v-if="!loading && visibleEvents.length > 0 && visibleEvents.length === totalEvents" class="text-center text-white-50 mt-4">Fim dos momentos.</p>
+                    </div>
+
+                    <div v-if="loading" class="text-center my-4">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        // Mount the app
+        const app = createApp(App);
+        app.mount('#app');
+    </script>
+</body>
 </html>
