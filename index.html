@@ -205,11 +205,25 @@
         </div>
       </nav>
       <div class="timeline bg-purple mt-5 d-flex">
-        <div class="d-flex justify-content-center my-3">
-          <button @click="carregarTodas" class="btn btn-primary mx-2">
-            Carregar todas!
-          </button>
-        </div>
+         <!-- Botões kawaii -->
+      <div class="btn-group-kawaii my-3 d-flex gap-3">
+        <button
+          :disabled="true"
+          class="btn-kawaii"
+        >
+          Parte 1
+        </button>
+        <button
+          onclick="window.location.href='https://yuris2kate.github.io/oneyear-together/'"
+          :disabled="true"
+          class="btn-kawaii"
+        >
+          Parte 2
+      </button>
+        <button @click="carregarTodas" class="btn-kawaii carregar-todas-btn">
+          Carregar todas!
+        </button>
+      </div>
         <h2 class="text-center my-4">Linha do Tempo ({{ totalEvents }})</h2>
         
         <!-- Image Preview Modal -->
